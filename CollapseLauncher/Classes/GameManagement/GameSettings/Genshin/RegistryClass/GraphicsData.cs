@@ -12,7 +12,7 @@ namespace CollapseLauncher.GameSettings.Genshin
     internal class GraphicsData
     {
         #region Properties
-        public static readonly int[] FPSIndex = new int[] { 30, 60, 45 };
+        public static readonly int[] FPSIndex = new int[] { 30, 45, 60 };
         public static readonly decimal[] RenderScaleIndex = new decimal[] { 0.6m, 0.8m, 1.0m, 1.1m, 1.2m, 1.3m, 1.4m, 1.5m }; 
         public int currentVolatielGrade { get; set; } = -1;
         public List<Dictionary<string, int>> customVolatileGrades { get; set; } = new();
