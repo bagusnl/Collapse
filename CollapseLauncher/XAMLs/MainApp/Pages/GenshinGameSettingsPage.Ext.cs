@@ -144,20 +144,17 @@ namespace CollapseLauncher.Pages
             set => Settings.SettingsGeneralData.graphicsData.Bloom = (BloomOption)(Convert.ToInt32(value) + 1);
         }
 
-        private int FixFpsValue(int x)
+        private int ConvertFpsValue(int x) => x switch
         {
-            return x switch
-            {
-                2 => 3,
-                3 => 2,
-                _ => 1,
-            };
-        }
+            2 => 3,
+            3 => 2,
+            _ => x,
+        };
 
         public int FPS
         {
-            get => FixFpsValue((int)Settings.SettingsGeneralData.graphicsData.FPS) - 1;
-            set => Settings.SettingsGeneralData.graphicsData.FPS = (FPSOption)(FixFpsValue(value + 1));
+            get => ConvertFpsValue((int)Settings.SettingsGeneralData.graphicsData.FPS) - 1;
+            set => Settings.SettingsGeneralData.graphicsData.FPS = (FPSOption)(ConvertFpsValue(value + 1));
         }
 
         public int RenderScale
