@@ -76,6 +76,7 @@ namespace CollapseLauncher.InstallManager.Base
             UpdateCompletenessStatus(CompletenessStatus.Idle);
         }
 
+        /*
         ~InstallManagerBase()
         {
 #if DEBUG
@@ -83,6 +84,7 @@ namespace CollapseLauncher.InstallManager.Base
 #endif
             Dispose();
         }
+        */
 
         protected void ResetToken() => _token = new CancellationTokenSource();
 
@@ -533,13 +535,14 @@ namespace CollapseLauncher.InstallManager.Base
                             // Delete directories inside gameDataFolderName that is not included in foldersToKeepInData
                             if (File.GetAttributes(folderGameData).HasFlag(FileAttributes.Directory))
                             {
+                                TryUnassignReadOnlyFiles(folderGameData);
                                 Directory.Delete(folderGameData, true);
                                 LogWriteLine($"Deleted folder: {folderGameData}", LogType.Default, true);
                             }
                             // Delete files inside gameDataFolderName that is not included in foldersToKeepInData
                             else
                             {
-                                File.Delete(folderGameData);
+                                TryDeleteReadOnlyFile(folderGameData);
                                 LogWriteLine($"Deleted file: {folderGameData}", LogType.Default, true);
                             }
                             continue;
@@ -581,15 +584,8 @@ namespace CollapseLauncher.InstallManager.Base
                     if (UninstallProperty.filesToDelete.Length != 0 && UninstallProperty.filesToDelete.Contains(Path.GetFileName(fileNames)) ||
                         UninstallProperty.filesToDelete.Length != 0 && UninstallProperty.filesToDelete.Any(pattern => Regex.IsMatch(Path.GetFileName(fileNames), pattern, RegexOptions.Compiled | RegexOptions.NonBacktracking)))
                     {
-                        try
-                        {
-                            File.Delete(fileNames);
-                            LogWriteLine($"Deleted {fileNames}", LogType.Default, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogWriteLine($"An error occurred while deleting file {fileNames}\r\n{ex}", LogType.Error, true);
-                        }
+                        TryDeleteReadOnlyFile(fileNames);
+                        LogWriteLine($"Deleted {fileNames}", LogType.Default, true);
                         continue;
                     }
                 }
@@ -628,6 +624,8 @@ namespace CollapseLauncher.InstallManager.Base
             {
                 LogWriteLine($"Failed while uninstalling game: {_gameVersionManager.GameType} - region: {_gameVersionManager.GamePreset.ZoneName}\r\n{ex}", LogType.Error, true);
             }
+
+            _gameVersionManager.UpdateGamePath("", true);
             _gameVersionManager.Reinitialize();
             return true;
         }
@@ -727,7 +725,7 @@ namespace CollapseLauncher.InstallManager.Base
                         await Task.Run(() =>
                         {
                             patcher.Initialize(patchPath);
-                            patcher.Patch(sourceBasePath, destPath, false, _token.Token);
+                            patcher.Patch(sourceBasePath, destPath, true, _token.Token);
                         }, _token.Token);
 
                         File.Move(destPath, sourceBasePath, true);

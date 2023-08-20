@@ -464,6 +464,9 @@ namespace CollapseLauncher.Pages
                         case ContentDialogResult.Secondary:
                             // If the main dialog is getting cancelled, then return false (as cancel and fallback to URL [if enabled]).
                             return false;
+                        case ContentDialogResult.None:
+                            // Return true when cancelled
+                            return true;
                     }
 
                     // If the file variable is not null anymore, then break from the loop and continue
@@ -738,7 +741,7 @@ namespace CollapseLauncher.Pages
 
             if (!await CurrentGameProperty._GameInstall.IsPreloadCompleted())
             {
-                PreloadDialogBox.Message = string.Format(Lang._HomePage.PreloadNotifSubtitle, ver);
+                PreloadDialogBox.Title = string.Format(Lang._HomePage.PreloadNotifTitle, ver);
             }
             else
             {
@@ -1365,7 +1368,7 @@ namespace CollapseLauncher.Pages
         #region Game Management Buttons
         private void RepairGameButton_Click(object sender, RoutedEventArgs e)
         {
-            MainFrameChanger.ChangeMainFrame(typeof(RepairPage));
+            m_mainPage.InvokeMainPageNavigateByTag("repair");
         }
 
         private async void UninstallGameButton_Click(object sender, RoutedEventArgs e)
